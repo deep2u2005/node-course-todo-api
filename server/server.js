@@ -43,6 +43,7 @@ app.get('/users', (req, res) => {
         res.status(400).send(err);
     });
 });
+
 app.post('/users', (req, res) => {
     var user = new User({
         Name: req.body.Name,
