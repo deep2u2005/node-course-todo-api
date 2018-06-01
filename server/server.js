@@ -12,6 +12,16 @@ var app = express();
 
 app.use(bodyParser.json());
 
+app.get('/todos', (req, res) => {
+    Todo.find().then((todos) => {
+        res.send({
+            todos
+        });
+    }, (err) => {
+        res.status(400).send(err);
+    });
+});
+
 app.post('/todos', (req, res) => {
     var todo = new Todo({
         text: req.body.text
@@ -23,6 +33,16 @@ app.post('/todos', (req, res) => {
     });
 });
 
+
+app.get('/users', (req, res) => {
+    User.find().then((users) => {
+        res.send({
+            users
+        });
+    }, (err) => {
+        res.status(400).send(err);
+    });
+});
 app.post('/users', (req, res) => {
     var user = new User({
         Name: req.body.Name,
