@@ -7,7 +7,7 @@ var { mongoose } = require('./db/mongoose');
 var { User } = require('./models/user');
 var { Todo } = require('./models/todo');
 
-const port = 3000;
+const port = process.env.PORT || 3000;
 
 var app = express();
 
@@ -95,6 +95,6 @@ app.post('/users', (req, res) => {
     });
 });
 
-app.listen(port), () => {
-    console.log('Started on port: ', port);
-};
+app.listen(port, () => {
+    console.log('Started listening on port: ', port);
+});
