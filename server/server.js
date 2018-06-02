@@ -1,3 +1,4 @@
+const _ = require('lodash');
 
 var express = require('express');
 var bodyParser = require('body-parser');
@@ -52,6 +53,44 @@ app.post('/todos', (req, res) => {
     });
 });
 
+// PATCH/todos/:id
+app.patch('/todos/:id', (req, res) => {
+    var id = req.params.id;
+    var body = _.pick(req.body, ['text', 'completed']);
+
+    if (!ObjectID.isValid(id)) {
+        return res.status(404).send();
+    }
+    
+    if (_.isBoolean(body.completed) && body.completed) {
+        body.completedAt = new Date().getDate();
+    } else {
+        body.completed = false;
+        body.completedAt = null;
+    }
+    Todo.findByIdAndUpdate(id, { $set: body }, { new: true }).then((todo) => {
+        if (!todo) {
+            return res.status(404).send();
+        }
+        res.send({ todo });
+    }).catch((err) => {
+        res.status(400).send();
+    });
+});
+
+// DELETE/todos/{id}
+app.delete('/todos/:id', (req, res) => {
+    var id = req.params.id;
+    if (!ObjectID.isValid(id)) {
+        return res.status(404).send();
+    }
+    Todo.findByIdAndRemove(id).then((todo) => {
+        res.status(200).send(todo);
+    }).catch(() => {
+        return res.status(404).send(res.body);
+    })
+});
+
 // GET/users
 app.get('/users', (req, res) => {
     User.find().then((users) => {
@@ -92,6 +131,37 @@ app.post('/users', (req, res) => {
         res.send(doc);
     }, (err) => {
         res.status(400).send(err);
+    });
+});
+
+// DELETE/users/{id}
+app.delete('/users/:id', (req, res) => {
+    var id = req.params.id;
+    if (!ObjectID.isValid(id)) {
+        return res.status(404).send();
+    }
+    User.findByIdAndRemove(id).then((user) => {
+        res.status(200).send(user);
+    }).catch(() => {
+        return res.status(404).send(res.body);
+    })
+});
+
+// PATCH/users/{id}
+app.patch('/users/:id', (req, res) => {
+    var id = req.params.id;
+    var body = _.pick(req.body, ['Name', 'Age', 'Address', 'isActive', 'Email']);
+    if (!ObjectID.isValid(id)) {
+        return res.status(404).send();
+    }
+
+    User.findByIdAndUpdate(id, { $set: body }, { new: true }).then((user) => {
+        if (!user) {
+            return res.status(404).send();
+        }
+        res.send({ user });
+    }).catch((err) => {
+        res.status(400).send();
     });
 });
 
