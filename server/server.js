@@ -61,7 +61,7 @@ app.patch('/todos/:id', (req, res) => {
     if (!ObjectID.isValid(id)) {
         return res.status(404).send();
     }
-    
+
     if (_.isBoolean(body.completed) && body.completed) {
         body.completedAt = new Date().getDate();
     } else {
@@ -119,18 +119,32 @@ app.get('/users/:id', (req, res) => {
 });
 
 // POST/users
+// app.post('/users', (req, res) => {
+//     var user = new User({
+//         Name: req.body.Name,
+//         Age: req.body.Age,
+//         Address: req.body.Address,
+//         Email: req.body.Email,
+//         isActive: req.body.isActive
+//     });
+//     user.save().then((doc) => {
+//         res.send(doc);
+//     }, (err) => {
+//         res.status(400).send(err);
+//     });
+// });
+
+// POST/users 
 app.post('/users', (req, res) => {
-    var user = new User({
-        Name: req.body.Name,
-        Age: req.body.Age,
-        Address: req.body.Address,
-        Email: req.body.Email,
-        isActive: req.body.isActive
-    });
-    user.save().then((doc) => {
-        res.send(doc);
-    }, (err) => {
-        res.status(400).send(err);
+    var body = _.pick(req.body, ['Email', 'Password']);
+    var user = new User(body);
+
+    user.save().then(() => {
+        return user.generateAuthToken();
+    }).then((token) => {
+        res.header('x-auth', token).send(user);
+    }).catch((e) => {
+        res.status(400).send(e);
     });
 });
 
